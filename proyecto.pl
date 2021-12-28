@@ -2,8 +2,8 @@ date(Dia, Mes, Agno, [Dia, Mes, Agno]):- integer(Dia), integer(Mes),
 integer(Agno).
 
 
-%   Significado salida paradimadocs =[nombre, Fecha creacion, Lista de usuarios, lista de Documentos]
-paradigmadocs(Nombre, [Dia, Mes, Agno], [Nombre, Date, [], []]) :-
+%   Significado salida paradimadocs =[nombre, Fecha creacion, Lista de usuarios, lista de Documentos, usuario activo]
+paradigmadocs(Nombre, [Dia, Mes, Agno], [Nombre, Date, [], [], []]) :-
     string(Nombre),
     date(Dia, Mes, Agno,Date).
 
@@ -15,8 +15,8 @@ usuario(Nombre, Password, [Nombre, [Dia, Mes, Agno]]) :-
 
 
 
-canLogin(Nombre, Password, [[Nombre, Password, _]|Resto]).
-canLogin(Nombre, Password, [[Nombre, Password, _]|Resto]) :-
+canLogin(Nombre, Password, [[Nombre, Password]|Resto]).
+canLogin(Nombre, Password, [[N, P]|Resto]) :-
     string(Nombre),
     string(Password),
     canLogin(Nombre, Password, Resto).
@@ -30,9 +30,20 @@ canRegister(Nombre, [[N, _]|Resto]) :-
     canRegister(Nombre, Resto).
 
 
-register(Nombre, Password, [N, F, LU, LD], [N, F, LUA, LD]):-
-    not(canRegister(Nombre, LU)),
-    append(LU, [[Nombre, Password]], LUA).
+register(Nombre, Password, [N, F, LU, LD, UA], [N, F, LUA, LD, UA]):-
+    ((not(canRegister(Nombre, LU)),
+    append(LU, [[Nombre, Password]], LUA));
+    LUA = LU).
+
+login( Nombre, Password, [N, F, LU, LD UA], [N, F, LU,LD NUA]):-
+    (
+        (
+            UA is [],
+            not(canLogin(Nombre, Password, LU)),
+            append(LU, [Nombre, Password], NUA)
+        );
+        NUA = UA
+    ).
 
 
 
