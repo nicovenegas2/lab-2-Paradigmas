@@ -2,6 +2,13 @@ date(Dia, Mes, Agno, [Dia, Mes, Agno]):- integer(Dia), integer(Mes),
 integer(Agno).
 
 
+% Hechos
+
+emptyList([]).
+
+
+
+
 %   Significado salida paradimadocs =[nombre, Fecha creacion, Lista de usuarios, lista de Documentos, usuario activo]
 paradigmadocs(Nombre, [Dia, Mes, Agno], [Nombre, Date, [], [], []]) :-
     string(Nombre),
@@ -38,7 +45,7 @@ register(Nombre, Password, [N, F, LU, LD, UA], [N, F, LUA, LD, UA]):-
 login( Nombre, Password, [N, F, LU, LD UA], [N, F, LU,LD NUA]):-
     (
         (
-            UA is [],
+            emptyList(UA),
             not(canLogin(Nombre, Password, LU)),
             append(LU, [Nombre, Password], NUA)
         );
