@@ -27,14 +27,15 @@ usuario(Nombre, Password,Date, [Nombre, Password, Date]) :-
     string(Password),
     date(Dia, Mes, Agno, Date).
 
-
-documento(Id, Nombre, [Dia, Mes, Agno], Autor, Contenido, [Id, Nombre, Date, Autor, Contenido]) :-
+%                                                           [id, nombre, fecha, autor, contenido, lista de permisos, lista de usuarios compartidos]
+documento(Id, Nombre, [Dia, Mes, Agno], Autor, Contenido, [Id, Nombre, Date, Autor, Contenido, [], []]) :-
     integer(Id),
     string(Nombre),
     date(Dia, Mes, Agno, Date),
     string(Autor),
     string(Contenido).
 
+documentGetter([Id, Nombre, Date, Autor, Contenido, Permisos, UsuariosCompartidos], [Id, Nombre, Date, Autor, Contenido, Permisos, UsuariosCompartidos]).
 
 addDocument(Sn1, Document, SOut) :-
     paraGetter(Sn1, [N, F, LU, LD, UA]),
@@ -42,7 +43,11 @@ addDocument(Sn1, Document, SOut) :-
     paraGetter([N, F, LU, LD1, UA], SOut).
 
 
-    
+getDocumentById([Document|_], Id, DocumentOut) :-
+    documentGetter(Document, [Id, _, _, _, _, _, _]),
+    DocumentOut = Document.
+getDocumentById([_|Resto], Id, DocumentOut) :-
+    getDocumentById(Resto, Id, DocumentOut).
 
 create(Sn1, Fecha, Nombre, Contenido, SOut) :-
     ((paraIsLogin(Sn1),
@@ -53,6 +58,7 @@ create(Sn1, Fecha, Nombre, Contenido, SOut) :-
     documento(Id, Nombre, Fecha, NombreA, Contenido, Document),
     addDocument(Sn1, Document, SOut))
     ; Sn1 = SOut).
+
 
 
  
