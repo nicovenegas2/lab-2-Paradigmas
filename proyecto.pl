@@ -36,7 +36,9 @@ paraEditDocument(Sn1, IDoc, NDoc, SOut) :-
     cambiar(Doc, LD, NDoc, NLD),
     paraGAS(SOut, [N, F, LU, NLD, UA]).
 
-
+paraLogOut(Sn1, SOut) :-
+    paraGAS(Sn1, [N, F, LU, LD, UA]),
+    paraGAS(SOut, [N, F, LU, LD, []]).
 
 
 
@@ -165,7 +167,8 @@ share(Sn1, IDoc, LPerms, LUsers, SOut) :-
     getDocumentById(LD, IDoc, Document),
     documentAddPermiso(Document, LPerms, Document1),
     documentAddUsers(Document1, LUsers, Document2),
-    paraEditDocument(Sn1, IDoc, Document2, SOut)
+    paraEditDocument(Sn1, IDoc, Document2, Sn2),
+    paraLogOut(Sn2, SOut)
     ); Sn1 = SOut).
 
 add(Sn1, IDoc, Fecha, Contenido, SOut) :-
@@ -173,11 +176,12 @@ add(Sn1, IDoc, Fecha, Contenido, SOut) :-
     paraGAS(Sn1, [_, _, _, LD, _]),
     getDocumentById(LD, IDoc, Document),
     documentAddContent(Document, Contenido, Document1),
-    documentGAS(Document1, [_, _, _, _, _, _, _, Versiones]),
+    documentGAS(Document, [_, _, _, _, Cont, _, _, Versiones]),
     length(Versiones, Id),
-    version(Id, Fecha, Contenido, Version),
+    version(Id, Fecha, Cont, Version),
     documentAddVersion(Document1, Version, Document2),
-    paraEditDocument(Sn1, IDoc, Document2, SOut)
+    paraEditDocument(Sn1, IDoc, Document2, Sn2),
+    paraLogOut(Sn2, SOut)
     ); Sn1 = SOut).
 
 
@@ -210,9 +214,11 @@ share(Word3, 0, ["T","C","W"], ["u1","u2"], Word4).
 
 paradigmadocs("Word", [27, 12, 2021], Word), register("nico", "1234", [03,05,2020], Word, Word1),   
 login("nico", "1234", Word1, Word2),
-create(Word2, [4,4,2021], "Primer Documento", "Contenido 1", Word3), 
-share(Word3, 0, ["T","C","W"], ["u1","u2"], Word4), 
-add(Word4, 0, [1,1,1]," Extension 1", Word5).
+create(Word2, [4,4,2021], "Primer Documento", "Contenido 1", Word3),
+login("nico", "1234", Word3, Word4),
+share(Word4, 0, ["T","C","W"], ["u1","u2"], Word5),
+login("nico", "1234", Word5, Word6), 
+add(Word6, 0, [1,1,1]," Extension 1", Word7).
 
 */
 
