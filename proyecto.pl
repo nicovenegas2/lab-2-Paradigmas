@@ -82,6 +82,10 @@ documentAddVersion(Doc1, Version, DOut) :-
     append(Versiones, [Version], NuevasVersiones),
     documentGAS([Id, Nombre, Date, Autor, Contenido, Permisos, UsuariosCompartidos, NuevasVersiones], DOut).
 
+documentSetContent(Doc1, Content, DOut) :-
+    documentGAS(Doc1, [Id, Nombre, Date, Autor, Contenido, Permisos, UsuariosCompartidos, Versiones]),
+    documentGAS([Id, Nombre, Date, Autor, Content, Permisos, UsuariosCompartidos, Versiones], DOut).
+
 
 addDocument(Sn1, Document, SOut) :-
     paraGAS(Sn1, [_, _, _, LD, _]),
@@ -106,6 +110,11 @@ getDocumentById([_|Resto], Id, DocumentOut) :-
     getDocumentById(Resto, Id, DocumentOut).
 
 
+getVersionById([Version|_], Id, VersionOut) :-
+    version(Id, _, _, Version),
+    VersionOut = Version.
+getVersionById([_|Resto], Id, VersionOut) :-
+    getVersionById(Resto, Id, VersionOut).
 
 
 
@@ -186,7 +195,20 @@ add(Sn1, IDoc, Fecha, Contenido, SOut) :-
 
 
 
-
+restoreVersion(Sn1, IDoc, IDVersion, SOut) :-
+    ((paraIsLogin(Sn1),
+    paraGAS(Sn1, [_, _, _, LD, _]),
+    getDocumentById(LD, IDoc, Document),
+    documentGAS(Document, [_, _, _, _, ContDoc, Permisos, UsuariosCompartidos, Versiones]),
+    getVersionById(Versiones, IDVersion, Version),
+    version(IDVersion, _, Cont, Version),
+    length(Versiones, Id),
+    version(Id, [-1,-1,-1], ContDoc, Version1),
+    documentAddVersion(Document, Version1, Document1),
+    documentSetContent(Document1, Cont, Document2),
+    paraEditDocument(Sn1, IDoc, Document2, Sn2),
+    paraLogOut(Sn2, SOut)
+    ); Sn1 = SOut).
 
 
 
@@ -220,5 +242,15 @@ share(Word4, 0, ["T","C","W"], ["u1","u2"], Word5),
 login("nico", "1234", Word5, Word6), 
 add(Word6, 0, [1,1,1]," Extension 1", Word7).
 
+
+ paradigmadocs("Word", [27, 12, 2021], Word), register("nico", "1234", [03,05,2020], Word, Word1),   
+login("nico", "1234", Word1, Word2),
+create(Word2, [4,4,2021], "Primer Documento", "Contenido 1", Word3),
+login("nico", "1234", Word3, Word4),
+share(Word4, 0, ["T","C","W"], ["u1","u2"], Word5),
+login("nico", "1234", Word5, Word6), 
+add(Word6, 0, [1,1,1]," Extension 1", Word7),
+login("nico", "1234", Word7, Word8),
+restoreVersion(Word8, 0, 0, Word9).
 */
 
