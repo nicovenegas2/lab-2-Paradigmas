@@ -168,7 +168,17 @@ share(Sn1, IDoc, LPerms, LUsers, SOut) :-
     paraEditDocument(Sn1, IDoc, Document2, SOut)
     ); Sn1 = SOut).
 
-
+add(Sn1, IDoc, Fecha, Contenido, SOut) :-
+    ((paraIsLogin(Sn1),
+    paraGAS(Sn1, [_, _, _, LD, _]),
+    getDocumentById(LD, IDoc, Document),
+    documentAddContent(Document, Contenido, Document1),
+    documentGAS(Document1, [_, _, _, _, _, _, _, Versiones]),
+    length(Versiones, Id),
+    version(Id, Fecha, Contenido, Version),
+    documentAddVersion(Document1, Version, Document2),
+    paraEditDocument(Sn1, IDoc, Document2, SOut)
+    ); Sn1 = SOut).
 
 
 
