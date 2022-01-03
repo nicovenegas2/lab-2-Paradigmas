@@ -141,23 +141,37 @@ canRegister(Nombre, [[_, _,_]|Resto]) :-
 
 
 %ARREGLAR, solo parametros Sn1 y SOut
-register(Nombre, Password, Date, [N, F, LU, LD, UA], [N, F, LUA, LD, UA]):-
-    ((not(canRegister(Nombre, LU)),
-    append(LU, [[Nombre, Password, Date]], LUA));
-    LUA = LU).
+
+register(Nombre, Password, Date, Sn1, SOut):-
+    ((paraGAS(Sn1, [N, F, LU, LD, UA]),
+    not(canRegister(Nombre, LU)),
+    usuario(Nombre, Password, Date, Usuario),
+    append(LU, [Usuario], NuevoUsuario),
+    paraGAS(SOut, [N, F, NuevoUsuario, LD, UA]))
+    ; Sn1 = Sout).
 
 
 %ARREGLAR, solo parametros Sn1 y SOut
-login( Nombre, Password, [N, F, LU, LD, UA], [N, F, LU,LD, NUA]):-
-    (
-        (
-            not(paraIsLogin([N, F, LU, LD, UA])),
-            canLogin(Nombre, Password, LU),
-            append(UA, [Nombre, Password, [-1,-1,-1]], NUA)
-        );
-        NUA = UA
-    ).
+% login( Nombre, Password, [N, F, LU, LD, UA], [N, F, LU,LD, NUA]):-
+%     (
+%         (
+%             not(paraIsLogin([N, F, LU, LD, UA])),
+%             canLogin(Nombre, Password, LU),
+%             append(UA, [Nombre, Password, [-1,-1,-1]], NUA)
+%         );
+%         NUA = UA
+%     ).
 
+
+login(Nombre, Password, Sn1, SOut) :-
+    (
+        (paraGAS(Sn1, [N, F, LU, LD, UA]),
+        not(paraIsLogin(Sn1)),
+        canLogin(Nombre, Password, LU),
+        usuario(Nombre, Password, [-1,-1,-1], Usuario),
+        append(UA, Usuario, UAA),
+        paraGAS(SOut, [N, F, LU, LD, UAA])
+    ); Sn1 = Sout).
 
 create(Sn1, Fecha, Nombre, Contenido, SOut) :-
     ((paraIsLogin(Sn1),
@@ -254,3 +268,10 @@ login("nico", "1234", Word7, Word8),
 restoreVersion(Word8, 0, 0, Word9).
 */
 
+
+
+/* 
+PREDICADOS
+
+
+*/
