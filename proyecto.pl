@@ -62,6 +62,10 @@ emptyList([]).
 
 
 
+% Reglas
+
+% Dom: Int, Int, Int, [Int, Int, Int]
+% Meta: crear una fecha
 cambiar(E, [E|Cola], NEl, [NEl|Cola]).
 cambiar(E, [AE|Cola], NEl, [AE|NC]):-
     cambiar(E, Cola, NEl, NC).
@@ -71,30 +75,42 @@ cambiar(E, [AE|Cola], NEl, [AE|NC]):-
 
 
 %   Significado salida paradimadocs =[nombre, Fecha creacion, Lista de usuarios, lista de Documentos, usuario activo]
+% Dom: String, date, paradigmadocs
+% Meta: Crear un paradigmadocs
 paradigmadocs(Nombre, Date, [Nombre, Date, [], [], []]) :-
     string(Nombre),
     date(_, _, _,Date).
 
 
 % GAS = Getter And Setter
+% Dom: List, List
+% Meta: poder extraer y setear datos de un paradigma
 paraGAS([N, F, LU, LD, UA], [N, F, LU, LD, UA]).
 
+% Dom: paradigmadocs
+% Meta: comprobar si un usuario esta logueado en un paradigmadocs
 paraIsLogin(Sn1) :-
     paraGAS(Sn1, [_, _, _, _, UA]),
     UA \= [].
 
+
+% Dom: paradigmadocs, Int, Documento, paradigmadocs
+% Meta: remplazar un documento en un paradigmadocs mediante su id
 paraEditDocument(Sn1, IDoc, NDoc, SOut) :-
     paraGAS(Sn1, [N, F, LU, LD, UA]),
     getDocumentById(LD, IDoc, Doc),
     cambiar(Doc, LD, NDoc, NLD),
     paraGAS(SOut, [N, F, LU, NLD, UA]).
 
+% Dom: paradigmadocs, paradigmadocs
+% Meta: desloguear un usuario de un paradigmadocs
 paraLogOut(Sn1, SOut) :-
     paraGAS(Sn1, [N, F, LU, LD, UA]),
     paraGAS(SOut, [N, F, LU, LD, []]).
 
 
-
+% Dom: String, String, date, usuario
+% Meta: crear un usuario, tambien se puede usar de getter y setter
 usuario(Nombre, Password,Date, [Nombre, Password, Date]) :-
     string(Nombre),
     string(Password),
@@ -104,7 +120,8 @@ usuario(Nombre, Password,Date, [Nombre, Password, Date]) :-
 
 
 
-
+% Dom: Int, String, date, String, String, Documento
+% Meta: crear un documento
 %                                             [id, nombre, fecha, autor, contenido, lista de permisos, lista de usuarios compartidos, lista de versiones]
 documento(Id, Nombre, Date, Autor, Contenido, [Id, Nombre, Date, Autor, Contenido, [], [], []]) :-
     integer(Id),
@@ -113,33 +130,48 @@ documento(Id, Nombre, Date, Autor, Contenido, [Id, Nombre, Date, Autor, Contenid
     string(Autor),
     string(Contenido).
 
+
+% Dom: Documento, Documento
+% Meta: poder extraer y setear datos de un documento
 documentGAS([Id, Nombre, Date, Autor, Contenido, Permisos, UsuariosCompartidos, Versiones], [Id, Nombre, Date, Autor, Contenido, Permisos, UsuariosCompartidos, Versiones]).
 
+% Dom: Documento, List, Documento
+% Meta: agregar una lista de permisos a un documento
 documentAddPermiso(Sn1, Permisos, Sn2) :-
     documentGAS(Sn1, [Id, Nombre, Date, Autor, Contenido, Permiso, UsuariosCompartidos, Versiones]),
     append(Permiso, Permisos, NuevosPermisos),
     documentGAS(Sn2, [Id, Nombre, Date, Autor, Contenido, NuevosPermisos, UsuariosCompartidos, Versiones]).
 
+% Dom: Documento, List, Documento
+% Meta: agregar una lista de usuarios compartidos a un documento
 documentAddUsers(Sn1, Usuarios, Sn2) :-
     documentGAS(Sn1, [Id, Nombre, Date, Autor, Contenido, Permisos, UsuariosCompartidos, Versiones]),
     append(UsuariosCompartidos, Usuarios, NuevosUsuarios),
     documentGAS([Id, Nombre, Date, Autor, Contenido, Permisos, NuevosUsuarios, Versiones], Sn2).
 
+
+% Dom: Documento, String, Documento
+% Meta: agregar contenido a un documento
 documentAddContent(Doc1, Content, DOut) :-
     documentGAS(Doc1, [Id, Nombre, Date, Autor, Contenido, Permisos, UsuariosCompartidos, Versiones]),
     string_concat(Contenido, Content, NuevoContenido),
     documentGAS([Id, Nombre, Date, Autor, NuevoContenido, Permisos, UsuariosCompartidos, Versiones], DOut).
 
+% Dom: Documento, version, Documento
+% Meta: agregar una version a un documento
 documentAddVersion(Doc1, Version, DOut) :-
     documentGAS(Doc1, [Id, Nombre, Date, Autor, Contenido, Permisos, UsuariosCompartidos, Versiones]),
     append(Versiones, [Version], NuevasVersiones),
     documentGAS([Id, Nombre, Date, Autor, Contenido, Permisos, UsuariosCompartidos, NuevasVersiones], DOut).
 
+% Dom: Documento, String, Documento
+% Meta: setear el contenido de un documento
 documentSetContent(Doc1, Content, DOut) :-
     documentGAS(Doc1, [Id, Nombre, Date, Autor, Contenido, Permisos, UsuariosCompartidos, Versiones]),
     documentGAS([Id, Nombre, Date, Autor, Content, Permisos, UsuariosCompartidos, Versiones], DOut).
 
-
+% Dom: paradigmadocs, documento, paradigmadocs
+% Meta: agregar un documento a un paradigmadocs
 addDocument(Sn1, Document, SOut) :-
     paraGAS(Sn1, [_, _, _, LD, _]),
     append(LD, [Document], LD1),
@@ -148,21 +180,24 @@ addDocument(Sn1, Document, SOut) :-
 
 
 
-
+% Dom: Int, date, String, Version
+% Meta: crear una version
 version(Id, Fecha, Content, [Id, Fecha, Content]) :-
     integer(Id),
     date(_, _, _, Fecha),
     string(Content).
 
 
-
+% Dom: Lista, Int, Documento
+% Meta: obtener un documento por su id
 getDocumentById([Document|_], Id, DocumentOut) :-
     documentGAS(Document, [Id, _, _, _, _, _, _, _]),
     DocumentOut = Document.
 getDocumentById([_|Resto], Id, DocumentOut) :-
     getDocumentById(Resto, Id, DocumentOut).
 
-
+% Dom: Lista, Int, Version
+% Meta: obtener una version por su id
 getVersionById([Version|_], Id, VersionOut) :-
     version(Id, _, _, Version),
     VersionOut = Version.
@@ -171,13 +206,8 @@ getVersionById([_|Resto], Id, VersionOut) :-
 
 
 
-
-
-
-
-
-
-
+% Dom: String, String, Lista
+% Meta: verificar si un usuario se puede logear
 canLogin(Nombre, Password, [[Nombre, Password,_]|_]).
 canLogin(Nombre, Password, [[_, _,_]|Resto]) :-
     string(Nombre),
@@ -186,15 +216,16 @@ canLogin(Nombre, Password, [[_, _,_]|Resto]) :-
 
 
 
-
+% Dom: String, Lista
+% Meta: verificar si un usuario se puede logear
 canRegister(Nombre, [[Nombre, _,_]|_]).
 canRegister(Nombre, [[_, _,_]|Resto]) :-
     string(Nombre),
     canRegister(Nombre, Resto).
 
 
-%ARREGLAR, solo parametros Sn1 y SOut
-
+% Dom: String, String, date, paradigmas, paradigmas
+% Meta: registar un usuario
 register(Nombre, Password, Date, Sn1, SOut):-
     ((paraGAS(Sn1, [N, F, LU, LD, UA]),
     not(canRegister(Nombre, LU)),
@@ -204,18 +235,8 @@ register(Nombre, Password, Date, Sn1, SOut):-
     ; Sn1 = Sout).
 
 
-%ARREGLAR, solo parametros Sn1 y SOut
-% login( Nombre, Password, [N, F, LU, LD, UA], [N, F, LU,LD, NUA]):-
-%     (
-%         (
-%             not(paraIsLogin([N, F, LU, LD, UA])),
-%             canLogin(Nombre, Password, LU),
-%             append(UA, [Nombre, Password, [-1,-1,-1]], NUA)
-%         );
-%         NUA = UA
-%     ).
-
-
+% Dom: String, String, paradigmas, paradigmas
+% Meta: logear un usuario
 login(Nombre, Password, Sn1, SOut) :-
     (
         (paraGAS(Sn1, [N, F, LU, LD, UA]),
@@ -226,6 +247,9 @@ login(Nombre, Password, Sn1, SOut) :-
         paraGAS(SOut, [N, F, LU, LD, UAA])
     ); Sn1 = Sout).
 
+
+% Dom: paradigmadocs, date, String, String, paradigmas
+% Meta: crear un documento y guardarlo en un paradigmadocs
 create(Sn1, Fecha, Nombre, Contenido, SOut) :-
     ((paraIsLogin(Sn1),
     paraGAS(Sn1, [N, F, A, LD, UA]),
@@ -237,6 +261,8 @@ create(Sn1, Fecha, Nombre, Contenido, SOut) :-
     paraGAS(SOut, [N, F, A, _, []]) )
     ; Sn1 = SOut).
 
+% Dom: paradigmadocs, Int, lista, lista, paradigmadocs
+% Meta: compartir un documento con otros usuarios
 share(Sn1, IDoc, LPerms, LUsers, SOut) :-
     ((paraIsLogin(Sn1),
     paraGAS(Sn1, [_, _, _, LD, _]),
@@ -247,6 +273,9 @@ share(Sn1, IDoc, LPerms, LUsers, SOut) :-
     paraLogOut(Sn2, SOut)
     ); Sn1 = SOut).
 
+
+% Dom paradigmadocs, Int, date, String, paradigmadocs
+% Meta: añadir contenido a un documento
 add(Sn1, IDoc, Fecha, Contenido, SOut) :-
     ((paraIsLogin(Sn1),
     paraGAS(Sn1, [_, _, _, LD, _]),
@@ -261,7 +290,8 @@ add(Sn1, IDoc, Fecha, Contenido, SOut) :-
     ); Sn1 = SOut).
 
 
-
+% Dom: paradigmadocs, Int, Int, paradigmadocs
+% Meta: restaurar una version de un documento
 restoreVersion(Sn1, IDoc, IDVersion, SOut) :-
     ((paraIsLogin(Sn1),
     paraGAS(Sn1, [_, _, _, LD, _]),
@@ -278,8 +308,6 @@ restoreVersion(Sn1, IDoc, IDVersion, SOut) :-
     ); Sn1 = SOut).
 
 
-
-% Z = [1,2,3], cambiar(1,Z,5,X).
 
 /*
 
