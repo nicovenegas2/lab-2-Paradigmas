@@ -238,46 +238,42 @@ register(Nombre, Password, Date, Sn1, SOut):-
 % Dom: String, String, paradigmas, paradigmas
 % Meta: logear un usuario
 login(Nombre, Password, Sn1, SOut) :-
-    (
-        (paraGAS(Sn1, [N, F, LU, LD, UA]),
-        not(paraIsLogin(Sn1)),
-        canLogin(Nombre, Password, LU),
-        usuario(Nombre, Password, [-1,-1,-1], Usuario),
-        append(UA, Usuario, UAA),
-        paraGAS(SOut, [N, F, LU, LD, UAA])
-    ); Sn1 = Sout).
+    paraGAS(Sn1, [N, F, LU, LD, UA]),
+    not(paraIsLogin(Sn1)),
+    canLogin(Nombre, Password, LU),
+    usuario(Nombre, Password, [-1,-1,-1], Usuario),
+    append(UA, Usuario, UAA),
+    paraGAS(SOut, [N, F, LU, LD, UAA]).
 
 
 % Dom: paradigmadocs, date, String, String, paradigmas
 % Meta: crear un documento y guardarlo en un paradigmadocs
 create(Sn1, Fecha, Nombre, Contenido, SOut) :-
-    ((paraIsLogin(Sn1),
+    paraIsLogin(Sn1),
     paraGAS(Sn1, [N, F, A, LD, UA]),
     date(_, _, _, Fecha),
     usuario(NombreA, _, _, UA),
     length(LD, Id),
     documento(Id, Nombre, Fecha, NombreA, Contenido, Document),
     addDocument(Sn1, Document, SOut),
-    paraGAS(SOut, [N, F, A, _, []]) )
-    ; Sn1 = SOut).
+    paraGAS(SOut, [N, F, A, _, []]).
 
 % Dom: paradigmadocs, Int, lista, lista, paradigmadocs
 % Meta: compartir un documento con otros usuarios
 share(Sn1, IDoc, LPerms, LUsers, SOut) :-
-    ((paraIsLogin(Sn1),
+    paraIsLogin(Sn1),
     paraGAS(Sn1, [_, _, _, LD, _]),
     getDocumentById(LD, IDoc, Document),
     documentAddPermiso(Document, LPerms, Document1),
     documentAddUsers(Document1, LUsers, Document2),
     paraEditDocument(Sn1, IDoc, Document2, Sn2),
-    paraLogOut(Sn2, SOut)
-    ); Sn1 = SOut).
+    paraLogOut(Sn2, SOut).
 
 
 % Dom paradigmadocs, Int, date, String, paradigmadocs
 % Meta: añadir contenido a un documento
 add(Sn1, IDoc, Fecha, Contenido, SOut) :-
-    ((paraIsLogin(Sn1),
+    paraIsLogin(Sn1),
     paraGAS(Sn1, [_, _, _, LD, _]),
     getDocumentById(LD, IDoc, Document),
     documentAddContent(Document, Contenido, Document1),
@@ -286,14 +282,13 @@ add(Sn1, IDoc, Fecha, Contenido, SOut) :-
     version(Id, Fecha, Cont, Version),
     documentAddVersion(Document1, Version, Document2),
     paraEditDocument(Sn1, IDoc, Document2, Sn2),
-    paraLogOut(Sn2, SOut)
-    ); Sn1 = SOut).
+    paraLogOut(Sn2, SOut).
 
 
 % Dom: paradigmadocs, Int, Int, paradigmadocs
 % Meta: restaurar una version de un documento
 restoreVersion(Sn1, IDoc, IDVersion, SOut) :-
-    ((paraIsLogin(Sn1),
+    paraIsLogin(Sn1),
     paraGAS(Sn1, [_, _, _, LD, _]),
     getDocumentById(LD, IDoc, Document),
     documentGAS(Document, [_, _, _, _, ContDoc, Permisos, UsuariosCompartidos, Versiones]),
@@ -304,8 +299,7 @@ restoreVersion(Sn1, IDoc, IDVersion, SOut) :-
     documentAddVersion(Document, Version1, Document1),
     documentSetContent(Document1, Cont, Document2),
     paraEditDocument(Sn1, IDoc, Document2, Sn2),
-    paraLogOut(Sn2, SOut)
-    ); Sn1 = SOut).
+    paraLogOut(Sn2, SOut).
 
 
 
