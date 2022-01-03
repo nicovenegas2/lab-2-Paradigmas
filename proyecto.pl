@@ -2,6 +2,59 @@ date(Dia, Mes, Agno, [Dia, Mes, Agno]):- integer(Dia), integer(Mes),
 integer(Agno).
 
 
+
+/* 
+
+creacion de predicados para las funciones ya implementadas
+
+
+date(dia, mes, año, Fecha).
+
+predicados de apoyo
+cambiar(Elemento1, Lista, Elemento2, ListaCambiada).
+
+-------- TDA Paradigmadocs --------
+paradigmadocs(Nombre, Fecha, paradigmaOut).
+paraGAS(paradigma1, paradigma2).
+paraIsLogin(paradigma1).
+paraLogOut(paradigma1, paradigmaOut).
+paraEditDocument(paradigma1, IDoc, Document, paradigmaOut).
+
+-------- TDA Usuario ---------- solo necesitaba el constructor :(
+usuario(Nombre, Password, Fecha, Usuario).
+
+
+-------- TDA Documento --------
+documento(ID, Nombre, Fecha, NombreA, Contenido, Document).
+documentGAS(Document1, Document2).
+documentAddPermiso(Document1, LPerms, DocumentOut).
+documentAddUsers(Document1, LUsers, DocumentOut).
+documentAddContent(Document1, Contenido, DocumentOut).
+documentAddVersion(Document1, Version, DocumentOut).
+documentSetContent(Document1, Contenido, DocumentOut).
+addDocument(Usuario, Document, UsuarioOut).
+
+-------- TDA Version --------
+version(ID, Fecha, Contenido, Version).
+getVersionById(Versiones, ID, Version).
+getDocumentById(Lista, ID, Document).
+
+canLogin(Usuario, Password, listaUsuarios).
+canRegistrer(Nombre, listaUsuarios).
+
+
+-------- Predicados Principales --------
+register(Nombre, Password, Fecha, paradigmaIn, paradigmaOut).
+login(Nombre, Password, paradigmaIn, paradigmaOut).
+create(paradigmaIn, Fecha, Nombre, Contenido, paradigmaOut).
+share(paradigmaIn, IDoc, Permisos, Usuarios, paradigmaOut).
+add(paradigmaIn, IDoc, Fecha, Contenido, paradigmaOut).
+restoreVersion(paradigmaIn, IDoc, IDVersion, paradigmaOut).
+
+
+*/
+
+
 % Hechos
 
 emptyList([]).
@@ -257,7 +310,7 @@ login("nico", "1234", Word5, Word6),
 add(Word6, 0, [1,1,1]," Extension 1", Word7).
 
 
- paradigmadocs("Word", [27, 12, 2021], Word), register("nico", "1234", [03,05,2020], Word, Word1),   
+paradigmadocs("Word", [27, 12, 2021], Word), register("nico", "1234", [03,05,2020], Word, Word1),   
 login("nico", "1234", Word1, Word2),
 create(Word2, [4,4,2021], "Primer Documento", "Contenido 1", Word3),
 login("nico", "1234", Word3, Word4),
@@ -270,8 +323,4 @@ restoreVersion(Word8, 0, 0, Word9).
 
 
 
-/* 
-PREDICADOS
 
-
-*/
