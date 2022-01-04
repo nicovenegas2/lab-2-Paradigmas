@@ -1,0 +1,20 @@
+Requerimientos Funcionales:
+- TDA:1
+- Register:1
+- Login:1
+- Create:1
+- Share:1
+- Add:1
+- RestoreVersion:1
+- ParadigmadocsToString:0
+
+Requerimientos No Funcionales:
+- Autoevaluación:1
+- Lenguaje:1
+- Versión:1
+- Documentación:1
+- Dom->Meta:1
+- Organización:1
+- Historial:1
+- Ejemplos:0.75
+- Prerrequisitos:1
