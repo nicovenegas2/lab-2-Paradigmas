@@ -262,8 +262,11 @@ create(Sn1, Fecha, Nombre, Contenido, SOut) :-
 % Meta: compartir un documento con otros usuarios
 share(Sn1, IDoc, LPerms, LUsers, SOut) :-
     paraIsLogin(Sn1),
-    paraGAS(Sn1, [_, _, _, LD, _]),
+    paraGAS(Sn1, [_, _, _, LD, UA]),
+    usuario(NombreA, _, _, UA),
     getDocumentById(LD, IDoc, Document),
+    documentGAS(Document, [_, _, _, Autor, Contenido, _, _, Versiones]),
+    Autor == NombreA,
     documentAddPermiso(Document, LPerms, Document1),
     documentAddUsers(Document1, LUsers, Document2),
     paraEditDocument(Sn1, IDoc, Document2, Sn2),
