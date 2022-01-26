@@ -364,14 +364,6 @@ paradigmaDocsAdd(Word6, 0, [1,1,1]," Extension 1", Word7),
 paradigmaDocsLogin(Word7, "nico", "1234", Word8),
 paradigmaDocsRestoreVersion(Word8, 0, 0, Word9).
 
-date(20, 12, 2015, D1), date(1, 12, 2021, D2),
-date(3, 12, 2021, D3),
-paradigmaDocs("google docs", D1, PD1),
-paradigmaDocsRegister(PD1, D2, "vflores", "hola123", PD2),
-paradigmaDocsRegister(PD2, D2, "crios", "qwert", PD3),
-paradigmaDocsLogin(PD3, "vflores", "hola123", PD4),
-paradigmaDocsLogin(PD4, "vflores", "xczxc", PD5).
-
 */
 
 
