@@ -340,7 +340,7 @@ paradigmaDocsRegister(Word, [03,05,2020], "nico", "1234", Word1),
 paradigmaDocsLogin(Word1, "nico", "1234", Word2),
 paradigmaDocsCreate(Word2, [4,4,2021], "Primer Documento", "Contenido 1", Word3),
 paradigmaDocsLogin(Word3, "nico", "1234", Word4),
-paradigmaDocsShare(Word4, 0, ["T","C","W"], ["u1","u2"], Word5).
+paradigmaDocsShare(Word4, 0, ["R","C","W"], ["u1","u2"], Word5).
 
 
 paradigmaDocs("Word", [27, 12, 2021], Word),
@@ -348,7 +348,7 @@ paradigmaDocsRegister(Word, [03,05,2020], "nico", "1234", Word1),
 paradigmaDocsLogin(Word1, "nico", "1234", Word2),
 paradigmaDocsCreate(Word2, [4,4,2021], "Primer Documento", "Contenido 1", Word3),
 paradigmaDocsLogin(Word3, "nico", "1234", Word4),
-paradigmaDocsShare(Word4, 0, ["T","C","W"], ["u1","u2"], Word5),
+paradigmaDocsShare(Word4, 0, ["R","C","W"], ["u1","u2"], Word5),
 paradigmaDocsLogin(Word5, "nico", "1234", Word6),
 paradigmaDocsAdd(Word6, 0, [1,1,1]," Extension 1", Word7).
 
@@ -358,7 +358,7 @@ paradigmaDocsRegister(Word, [03,05,2020], "nico", "1234", Word1),
 paradigmaDocsLogin(Word1, "nico", "1234", Word2),
 paradigmaDocsCreate(Word2, [4,4,2021], "Primer Documento", "Contenido 1", Word3),
 paradigmaDocsLogin(Word3, "nico", "1234", Word4),
-paradigmaDocsShare(Word4, 0, ["T","C","W"], ["u1","u2"], Word5),
+paradigmaDocsShare(Word4, 0, ["R","C","W"], ["u1","u2"], Word5),
 paradigmaDocsLogin(Word5, "nico", "1234", Word6),
 paradigmaDocsAdd(Word6, 0, [1,1,1]," Extension 1", Word7),
 paradigmaDocsLogin(Word7, "nico", "1234", Word8),
