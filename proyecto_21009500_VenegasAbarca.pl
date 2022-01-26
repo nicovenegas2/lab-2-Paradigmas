@@ -58,7 +58,9 @@ restoreVersion(paradigmaIn, IDoc, IDVersion, paradigmaOut).
 % Hechos
 
 emptyList([]).
-
+permiso("W").
+permiso("R").
+permiso("C").
 
 
 
@@ -77,7 +79,7 @@ cambiar(E, [AE|Cola], NEl, [AE|NC]):-
 %   Significado salida paradimadocs =[nombre, Fecha creacion, Lista de usuarios, lista de Documentos, usuario activo]
 % Dom: String, date, paradigmadocs
 % Meta: Crear un paradigmadocs
-paradigmadocs(Nombre, Date, [Nombre, Date, [], [], []]) :-
+paradigmaDocs(Nombre, Date, [Nombre, Date, [], [], []]) :-
     string(Nombre),
     date(_, _, _,Date).
 
@@ -180,6 +182,15 @@ addDocument(Sn1, Document, SOut) :-
 
 
 
+
+% Dom: Lista de permisos
+% Meta: Comprobar que solo hayan los permisos correctos
+checkPermisos([]).
+checkPermisos([Permiso|Cola]) :-
+    permiso(Permiso),
+    checkPermisos(Cola).
+
+
 % Dom: Int, date, String, Version
 % Meta: crear una version
 version(Id, Fecha, Content, [Id, Fecha, Content]) :-
@@ -226,20 +237,19 @@ canRegister(Nombre, [[_, _,_]|Resto]) :-
 
 % Dom: String, String, date, paradigmas, paradigmas
 % Meta: registar un usuario
-register(Nombre, Password, Date, Sn1, SOut):-
-    ((paraGAS(Sn1, [N, F, LU, LD, UA]),
+paradigmaDocsRegister( Sn1, Date, Nombre, Password, SOut):-
+    paraGAS(Sn1, [N, F, LU, LD, UA]),
     not(canRegister(Nombre, LU)),
     usuario(Nombre, Password, Date, Usuario),
     append(LU, [Usuario], NuevoUsuario),
-    paraGAS(SOut, [N, F, NuevoUsuario, LD, UA]))
-    ; Sn1 = Sout).
+    paraGAS(SOut, [N, F, NuevoUsuario, LD, UA]).
 
 
 % Dom: String, String, paradigmas, paradigmas
 % Meta: logear un usuario
-login(Nombre, Password, Sn1, SOut) :-
-    paraGAS(Sn1, [N, F, LU, LD, UA]),
+paradigmaDocsLogin(Sn1, Nombre, Password, SOut) :-
     not(paraIsLogin(Sn1)),
+    paraGAS(Sn1, [N, F, LU, LD, UA]),
     canLogin(Nombre, Password, LU),
     usuario(Nombre, Password, [-1,-1,-1], Usuario),
     append(UA, Usuario, UAA),
@@ -248,7 +258,7 @@ login(Nombre, Password, Sn1, SOut) :-
 
 % Dom: paradigmadocs, date, String, String, paradigmas
 % Meta: crear un documento y guardarlo en un paradigmadocs
-create(Sn1, Fecha, Nombre, Contenido, SOut) :-
+paradigmaDocsCreate(Sn1, Fecha, Nombre, Contenido, SOut) :-
     paraIsLogin(Sn1),
     paraGAS(Sn1, [N, F, A, LD, UA]),
     date(_, _, _, Fecha),
@@ -260,10 +270,11 @@ create(Sn1, Fecha, Nombre, Contenido, SOut) :-
 
 % Dom: paradigmadocs, Int, lista, lista, paradigmadocs
 % Meta: compartir un documento con otros usuarios
-share(Sn1, IDoc, LPerms, LUsers, SOut) :-
+paradigmaDocsShare(Sn1, IDoc, LPerms, LUsers, SOut) :-
     paraIsLogin(Sn1),
     paraGAS(Sn1, [_, _, _, LD, UA]),
     usuario(NombreA, _, _, UA),
+    checkPermisos(LPerms),
     getDocumentById(LD, IDoc, Document),
     documentGAS(Document, [_, _, _, Autor, Contenido, _, _, Versiones]),
     Autor == NombreA,
@@ -275,7 +286,7 @@ share(Sn1, IDoc, LPerms, LUsers, SOut) :-
 
 % Dom paradigmadocs, Int, date, String, paradigmadocs
 % Meta: añadir contenido a un documento
-add(Sn1, IDoc, Fecha, Contenido, SOut) :-
+paradigmaDocsAdd(Sn1, IDoc, Fecha, Contenido, SOut) :-
     paraIsLogin(Sn1),
     paraGAS(Sn1, [_, _, _, LD, _]),
     getDocumentById(LD, IDoc, Document),
@@ -290,7 +301,7 @@ add(Sn1, IDoc, Fecha, Contenido, SOut) :-
 
 % Dom: paradigmadocs, Int, Int, paradigmadocs
 % Meta: restaurar una version de un documento
-restoreVersion(Sn1, IDoc, IDVersion, SOut) :-
+paradigmaDocsRestoreVersion(Sn1, IDoc, IDVersion, SOut) :-
     paraIsLogin(Sn1),
     paraGAS(Sn1, [_, _, _, LD, _]),
     getDocumentById(LD, IDoc, Document),
@@ -308,42 +319,59 @@ restoreVersion(Sn1, IDoc, IDVersion, SOut) :-
 
 /*
 
-paradigmadocs("Word", [27, 12, 2021], Word), register("nico", "1234", [03,05,2020], Word, Word1), register("nico", "123424234", Word1, Word2).
+paradigmaDocs("Word", [27, 12, 2021], Word),
+paradigmaDocsRegister(Word, [03,05,2020], "nico", "1234", Word1),   
+paradigmaDocsRegister(Word, [03,05,2020], "nico", "1234234234", Word1).
 
-paradigmadocs("Word", [27, 12, 2021], Word), register("nico", "1234", [03,05,2020], Word, Word1),              
-login("nico", "1234", Word1, Word2).
-
-
-paradigmadocs("Word", [27, 12, 2021], Word), register("nico", "1234", [03,05,2020], Word, Word1),   
-login("nico", "1234", Word1, Word2),
-create(Word2, [4,4,2021], "Primer Documento", "Contenido 1", Word3).
+paradigmaDocs("Word", [27, 12, 2021], Word),
+paradigmaDocsRegister(Word, [03,05,2020], "nico", "1234", Word1),   
+paradigmaDocsLogin(Word1, "nico", "1234", Word2).
 
 
-
-paradigmadocs("Word", [27, 12, 2021], Word), register("nico", "1234", [03,05,2020], Word, Word1),   
-login("nico", "1234", Word1, Word2),
-create(Word2, [4,4,2021], "Primer Documento", "Contenido 1", Word3), 
-share(Word3, 0, ["T","C","W"], ["u1","u2"], Word4).
-
-
-paradigmadocs("Word", [27, 12, 2021], Word), register("nico", "1234", [03,05,2020], Word, Word1),   
-login("nico", "1234", Word1, Word2),
-create(Word2, [4,4,2021], "Primer Documento", "Contenido 1", Word3),
-login("nico", "1234", Word3, Word4),
-share(Word4, 0, ["T","C","W"], ["u1","u2"], Word5),
-login("nico", "1234", Word5, Word6), 
-add(Word6, 0, [1,1,1]," Extension 1", Word7).
+paradigmaDocs("Word", [27, 12, 2021], Word),
+paradigmaDocsRegister(Word, [03,05,2020], "nico", "1234", Word1),   
+paradigmaDocsLogin(Word1, "nico", "1234", Word2),
+paradigmaDocsCreate(Word2, [4,4,2021], "Primer Documento", "Contenido 1", Word3).
 
 
-paradigmadocs("Word", [27, 12, 2021], Word), register("nico", "1234", [03,05,2020], Word, Word1),   
-login("nico", "1234", Word1, Word2),
-create(Word2, [4,4,2021], "Primer Documento", "Contenido 1", Word3),
-login("nico", "1234", Word3, Word4),
-share(Word4, 0, ["T","C","W"], ["u1","u2"], Word5),
-login("nico", "1234", Word5, Word6), 
-add(Word6, 0, [1,1,1]," Extension 1", Word7),
-login("nico", "1234", Word7, Word8),
-restoreVersion(Word8, 0, 0, Word9).
+
+paradigmaDocs("Word", [27, 12, 2021], Word),
+paradigmaDocsRegister(Word, [03,05,2020], "nico", "1234", Word1),   
+paradigmaDocsLogin(Word1, "nico", "1234", Word2),
+paradigmaDocsCreate(Word2, [4,4,2021], "Primer Documento", "Contenido 1", Word3),
+paradigmaDocsLogin(Word3, "nico", "1234", Word4),
+paradigmaDocsShare(Word4, 0, ["T","C","W"], ["u1","u2"], Word5).
+
+
+paradigmaDocs("Word", [27, 12, 2021], Word),
+paradigmaDocsRegister(Word, [03,05,2020], "nico", "1234", Word1),   
+paradigmaDocsLogin(Word1, "nico", "1234", Word2),
+paradigmaDocsCreate(Word2, [4,4,2021], "Primer Documento", "Contenido 1", Word3),
+paradigmaDocsLogin(Word3, "nico", "1234", Word4),
+paradigmaDocsShare(Word4, 0, ["T","C","W"], ["u1","u2"], Word5),
+paradigmaDocsLogin(Word5, "nico", "1234", Word6),
+paradigmaDocsAdd(Word6, 0, [1,1,1]," Extension 1", Word7).
+
+
+paradigmaDocs("Word", [27, 12, 2021], Word),
+paradigmaDocsRegister(Word, [03,05,2020], "nico", "1234", Word1),   
+paradigmaDocsLogin(Word1, "nico", "1234", Word2),
+paradigmaDocsCreate(Word2, [4,4,2021], "Primer Documento", "Contenido 1", Word3),
+paradigmaDocsLogin(Word3, "nico", "1234", Word4),
+paradigmaDocsShare(Word4, 0, ["T","C","W"], ["u1","u2"], Word5),
+paradigmaDocsLogin(Word5, "nico", "1234", Word6),
+paradigmaDocsAdd(Word6, 0, [1,1,1]," Extension 1", Word7),
+paradigmaDocsLogin(Word7, "nico", "1234", Word8),
+paradigmaDocsRestoreVersion(Word8, 0, 0, Word9).
+
+date(20, 12, 2015, D1), date(1, 12, 2021, D2),
+date(3, 12, 2021, D3),
+paradigmaDocs("google docs", D1, PD1),
+paradigmaDocsRegister(PD1, D2, "vflores", "hola123", PD2),
+paradigmaDocsRegister(PD2, D2, "crios", "qwert", PD3),
+paradigmaDocsLogin(PD3, "vflores", "hola123", PD4),
+paradigmaDocsLogin(PD4, "vflores", "xczxc", PD5).
+
 */
 
 
